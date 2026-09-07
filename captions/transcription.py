@@ -5,7 +5,12 @@ import tempfile
 import whisper
 
 
-def transcribe_video(file_bytes: bytes, model_size: str, progress_callback=None):
+def transcribe_video(
+    file_bytes: bytes,
+    model_size: str,
+    progress_callback=None,
+    language: str | None = None,
+):
     """Transkribiert die Videodatei und gibt eine flache Liste von Wort-Dicts zurück."""
     with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as tmp_in:
         tmp_in.write(file_bytes)
@@ -17,7 +22,12 @@ def transcribe_video(file_bytes: bytes, model_size: str, progress_callback=None)
         model = whisper.load_model(model_size)
         if progress_callback:
             progress_callback(25, "Audio wird analysiert...")
-        result = model.transcribe(input_path, verbose=True, word_timestamps=True)
+        result = model.transcribe(
+            input_path,
+            verbose=True,
+            word_timestamps=True,
+            language=language,
+        )
 
         all_words = []
         segments = result["segments"]

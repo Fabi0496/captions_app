@@ -7,7 +7,7 @@ gestylte Untertitel per FFmpeg/ASS direkt ins Video einbrennt.
 ## Funktionen
 
 - Video-Upload (MP4)
-- Automatische Transkription mit wählbarer Whisper-Modellgröße
+- Transkription mit wählbarer Whisper-Modellgröße und Audiosprache
 - Wort-für-Wort-Zeitstempel
 - Gruppierung mehrerer Wörter pro Untertitel-Zeile, mit automatischem
   Zeilenumbruch bei Satzende
@@ -109,7 +109,8 @@ Im Browser (`http://localhost:8501`):
 1. Video hochladen
 2. Sidebar-Einstellungen anpassen (Schrift, Farben, Animation)
 3. Live-Vorschau prüfen
-4. Whisper-Modell wählen und **„Video transkribieren"** klicken
+4. Whisper-Modell und optional die Sprache der Audiospur wählen und
+   **„Video transkribieren"** klicken
 5. Text bei Bedarf in der Tabelle korrigieren (Wörter teilen/löschen)
 6. **„Animierte Untertitel erstellen"** klicken
 7. Fertiges Video bzw. `.ass`-Datei über die Download-Buttons speichern

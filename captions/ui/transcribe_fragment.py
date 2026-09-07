@@ -2,7 +2,7 @@
 import pandas as pd
 import streamlit as st
 
-from ..config import WHISPER_MODELS
+from ..config import WHISPER_LANGUAGES, WHISPER_MODELS
 from ..transcription import transcribe_video
 
 
@@ -10,6 +10,15 @@ from ..transcription import transcribe_video
 def transcribe_fragment():
     st.subheader("Schritt 1: Transkription")
     whisper_model_size = st.selectbox("Whisper-Modell", WHISPER_MODELS, index=3)
+    language_label = st.selectbox(
+        "Sprache der Audiospur",
+        list(WHISPER_LANGUAGES),
+        help=(
+            "Wenn die Sprache feststeht, kann Whisper die automatische "
+            "Spracherkennung überspringen."
+        ),
+    )
+    language = WHISPER_LANGUAGES[language_label]
 
     if st.button("Video transkribieren"):
         progress = st.progress(0, text="Whisper wird gestartet...")
@@ -20,6 +29,7 @@ def transcribe_fragment():
         all_words = transcribe_video(
             st.session_state["file_bytes"],
             whisper_model_size,
+            language=language,
             progress_callback=update_progress,
         )
         progress.empty()

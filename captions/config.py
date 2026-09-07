@@ -38,4 +38,21 @@ ANIMATION_STYLES = [
 
 WHISPER_MODELS = ["tiny", "base", "small", "medium", "turbo"]
 
+WHISPER_LANGUAGES = {
+    "Automatisch erkennen": None,
+    "Deutsch": "de",
+    "Englisch": "en",
+    "Französisch": "fr",
+    "Spanisch": "es",
+    "Italienisch": "it",
+    "Niederländisch": "nl",
+    "Portugiesisch": "pt",
+    "Polnisch": "pl",
+    "Türkisch": "tr",
+    "Russisch": "ru",
+    "Japanisch": "ja",
+    "Koreanisch": "ko",
+    "Chinesisch": "zh",
+}
+
 VIDEO_WIDTH = 390
