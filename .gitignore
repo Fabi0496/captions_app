@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Local FFmpeg binaries
+ffmpeg.exe
+ffprobe.exe
+
+# Streamlit runtime/cache files
+.streamlit/*
+!.streamlit/config.toml
+
+# Generated media / temporary files
+*.mp4
+*.ass
+*.srt
+*.log
