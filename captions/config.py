@@ -38,4 +38,4 @@ ANIMATION_STYLES = [
 
 WHISPER_MODELS = ["tiny", "base", "small", "medium", "turbo"]
 
-VIDEO_WIDTH = 360
+VIDEO_WIDTH = 390
