@@ -49,6 +49,37 @@ def extract_preview_frame(video_bytes: bytes, cache_key: str) -> bytes:
     return frame_bytes
 
 
+@st.cache_data(show_spinner=False)
+def create_display_video(video_bytes: bytes, cache_key: str) -> bytes:
+    """Erzeugt eine kleine Anzeigeversion, damit große Uploads den Browser nicht überlasten."""
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as tmp_in:
+        tmp_in.write(video_bytes)
+        in_path = tmp_in.name
+
+    out_path = in_path.replace(".mp4", "_display.mp4")
+    try:
+        result = subprocess.run(
+            [
+                FFMPEG_BIN, "-y", "-i", in_path,
+                "-vf", "scale='min(360,iw)':-2",
+                "-c:v", "libx264", "-preset", "ultrafast", "-tune", "fastdecode",
+                "-crf", "35", "-threads", "0", "-pix_fmt", "yuv420p", "-an",
+                "-movflags", "+faststart",
+                out_path,
+            ],
+            capture_output=True, text=True,
+        )
+        if result.returncode != 0 or not os.path.exists(out_path):
+            raise RuntimeError(f"FFmpeg konnte die Anzeigeversion nicht erstellen: {result.stderr}")
+        with open(out_path, "rb") as f:
+            return f.read()
+    finally:
+        for path in (in_path, out_path):
+            if os.path.exists(path):
+                os.remove(path)
+
+
+@st.cache_data(show_spinner=False)
 def render_animated_preview(frame_bytes, group_size, font_name, font_size, primary_color,
                           highlight_color, outline_color, pos_y_percent, animation_style,
                           card_opacity_percent, card_bg_color, card_text_color,

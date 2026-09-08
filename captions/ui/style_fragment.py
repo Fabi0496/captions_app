@@ -1,7 +1,7 @@
 """Fragment 1: Schrift-/Animations-Einstellungen, Live-Vorschau und Originalvideo."""
 import streamlit as st
 
-from ..config import FONT_OPTIONS, FONT_FILE_PATHS, ANIMATION_STYLES, VIDEO_WIDTH
+from ..config import FONT_OPTIONS, FONT_FILE_PATHS, ANIMATION_STYLES, PREVIEW_WIDTH
 from ..preview import extract_preview_frame, render_animated_preview
 
 
@@ -52,56 +52,42 @@ def style_fragment():
     )
 
     with preview_col:
-        preview_left, preview_right = st.columns(2)
-
-        with preview_left:
+        st.markdown(
+            "<h3 style='text-align:center; width:100%;'>Style-Vorschau</h3>",
+            unsafe_allow_html=True,
+        )
+        if st.session_state["file_bytes"] is None:
             st.markdown(
-                "<h3 style='text-align:center; width:100%;'>Style-Vorschau</h3>",
+                """
+                <div style='display:flex;align-items:center;justify-content:center;height:280px;border:1px solid rgba(255,255,255,0.12);border-radius:14px;background:linear-gradient(135deg,#141c2f,#0f1729);color:#cbd5e1;font-size:15px;'>
+                    Vorschau-Schablone<br><span style='font-size:12px;color:#8aa0c8;'>Video wird hier eingebettet</span>
+                </div>
+                """,
                 unsafe_allow_html=True,
             )
-            video_left, video_col, video_right = st.columns([1, 3, 1])
-            with video_col, st.container(width=VIDEO_WIDTH):
-                if st.session_state["file_bytes"] is None:
-                    st.markdown(
-                        """
-                        <div style='display:flex;align-items:center;justify-content:center;height:280px;border:1px solid rgba(255,255,255,0.12);border-radius:14px;background:linear-gradient(135deg,#141c2f,#0f1729);color:#cbd5e1;font-size:15px;'>
-                            Vorschau-Schablone<br><span style='font-size:12px;color:#8aa0c8;'>Video wird hier eingebettet</span>
-                        </div>
-                        """,
-                        unsafe_allow_html=True,
-                    )
-                else:
-                    with st.spinner("Vorschau wird erstellt..."):
-                        base_frame = extract_preview_frame(
-                            st.session_state["file_bytes"], st.session_state["file_hash"]
-                        )
-                        preview_video = render_animated_preview(
-                            base_frame, words_per_group, font_name, font_size,
-                            primary_color, highlight_color, outline_color, pos_y_percent,
-                            animation_style, card_opacity_percent, card_bg_color,
-                            card_text_color, card_corner_radius_percent
-                        )
-                    if preview_video:
-                        st.video(preview_video, width=VIDEO_WIDTH, loop=True, autoplay=True, muted=True)
-                        st.caption(f"Beispiel mit {words_per_group} Wort(en) pro Untertitel-Zeile")
-                    else:
-                        st.warning("Vorschau konnte nicht erstellt werden.")
-
-        with preview_right:
-            st.markdown(
-                "<h3 style='text-align:center; width:100%;'>Originalvideo</h3>",
-                unsafe_allow_html=True,
+        else:
+            preview_signature = (
+                st.session_state["file_hash"], words_per_group, font_name, font_size,
+                primary_color, highlight_color, outline_color, pos_y_percent,
+                animation_style, card_opacity_percent, card_bg_color,
+                card_text_color, card_corner_radius_percent,
             )
-            video_left, video_col, video_right = st.columns([1, 3, 1])
-            with video_col, st.container(width=VIDEO_WIDTH):
-                if st.session_state["file_bytes"] is None:
-                    st.markdown(
-                        """
-                        <div style='display:flex;align-items:center;justify-content:center;height:280px;border:1px solid rgba(255,255,255,0.12);border-radius:14px;background:linear-gradient(135deg,#121a2d,#0d1525);color:#b8c2d8;font-size:15px;'>
-                            Originalvideo-Schablone<br><span style='font-size:12px;color:#8aa0c8;'>Hier erscheint dein Video nach dem Upload</span>
-                        </div>
-                        """,
-                        unsafe_allow_html=True,
+            if st.session_state["preview_signature"] != preview_signature:
+                with st.spinner("Vorschau wird erstellt..."):
+                    base_frame = extract_preview_frame(
+                        st.session_state["file_bytes"], st.session_state["file_hash"]
                     )
-                else:
-                    st.video(st.session_state["file_bytes"], width=VIDEO_WIDTH)
+                    st.session_state["preview_video"] = render_animated_preview(
+                        base_frame, words_per_group, font_name, font_size,
+                        primary_color, highlight_color, outline_color, pos_y_percent,
+                        animation_style, card_opacity_percent, card_bg_color,
+                        card_text_color, card_corner_radius_percent
+                    )
+                st.session_state["preview_signature"] = preview_signature
+            preview_video = st.session_state["preview_video"]
+            if preview_video:
+                with st.container(horizontal_alignment="center"):
+                    st.video(preview_video, width=PREVIEW_WIDTH, loop=True, autoplay=True, muted=True)
+                    st.caption(f"Beispiel mit {words_per_group} Wort(en) pro Untertitel-Zeile")
+            else:
+                st.warning("Vorschau konnte nicht erstellt werden.")

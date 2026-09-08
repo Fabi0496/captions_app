@@ -64,6 +64,7 @@ for key, default in [
     ("render_result", None), ("render_error", None),
     ("transcribed_words", None), ("transcribed_file_hash", None),
     ("file_bytes", None), ("file_hash", None),
+    ("preview_video", None), ("preview_signature", None),
 ]:
     if key not in st.session_state:
         st.session_state[key] = default
@@ -77,6 +78,8 @@ if uploaded_file is not None:
     if st.session_state["file_hash"] != file_hash:
         st.session_state["file_bytes"] = file_bytes
         st.session_state["file_hash"] = file_hash
+        st.session_state["preview_video"] = None
+        st.session_state["preview_signature"] = None
         st.session_state["transcribed_words"] = None
         st.session_state["transcribed_file_hash"] = None
         st.session_state["render_result"] = None

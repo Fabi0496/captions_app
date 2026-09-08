@@ -89,7 +89,14 @@ def render_final_video(file_bytes: bytes, corrected_words: list, style_params: d
         for line in process.stdout:
             line = line.strip()
             if line.startswith("out_time_ms="):
-                elapsed = int(line.split("=", 1)[1]) / 1_000_000
+                raw_elapsed = line.split("=", 1)[1]
+                if raw_elapsed == "N/A":
+                    continue
+                try:
+                    elapsed = int(raw_elapsed) / 1_000_000
+                except ValueError:
+                    progress_output.append(line)
+                    continue
                 if progress_callback:
                     percent = min(99, 5 + int((elapsed / duration) * 94))
                     progress_callback(percent, f"Rendering läuft... {min(99, int((elapsed / duration) * 100))} %")

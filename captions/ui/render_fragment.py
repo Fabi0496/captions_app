@@ -43,7 +43,8 @@ def render_fragment():
 
     if st.session_state["render_result"] is not None:
         st.success("Fertig! Hier ist dein Video mit animierten Untertiteln:")
-        st.video(st.session_state["render_result"]["video_bytes"], width=VIDEO_WIDTH)
+        with st.container(horizontal_alignment="center"):
+            st.video(st.session_state["render_result"]["video_bytes"], width=VIDEO_WIDTH)
 
         col1, col2 = st.columns(2)
         with col1:
