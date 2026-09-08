@@ -2,9 +2,24 @@
 import os
 import subprocess
 import tempfile
+import time
 
 from .config import FFMPEG_BIN, FFPROBE_BIN
 from .ass_builder import build_ass_header, build_ass_events, build_word_groups
+
+
+def _remove_file(path: str) -> None:
+    """Entfernt eine temporär gesperrte Datei unter Windows mit kurzen Wiederholungen."""
+    for attempt in range(5):
+        if not os.path.exists(path):
+            return
+        try:
+            os.remove(path)
+            return
+        except PermissionError:
+            if attempt == 4:
+                raise
+            time.sleep(0.2)
 
 
 def render_final_video(file_bytes: bytes, corrected_words: list, style_params: dict, use_qsv: bool,
@@ -15,7 +30,9 @@ def render_final_video(file_bytes: bytes, corrected_words: list, style_params: d
         input_path = tmp_in.name
 
     output_path = input_path.replace(".mp4", "_output.mp4")
+    ass_path = os.path.join(os.path.dirname(input_path), "untertitel_render.ass")
     sp = style_params
+    process = None
 
     try:
         groups = build_word_groups(corrected_words, sp["words_per_group"])
@@ -50,7 +67,6 @@ def render_final_video(file_bytes: bytes, corrected_words: list, style_params: d
         ass_filename = "untertitel_render.ass"
         output_filename = os.path.basename(output_path)
 
-        ass_path = os.path.join(work_dir, ass_filename)
         with open(ass_path, "w", encoding="utf-8") as f:
             f.write(ass_content)
 
@@ -95,7 +111,9 @@ def render_final_video(file_bytes: bytes, corrected_words: list, style_params: d
                 "ass_content": ass_content, "error": None}
 
     finally:
-        if os.path.exists(input_path):
-            os.remove(input_path)
-        if os.path.exists(output_path):
-            os.remove(output_path)
+        if process is not None and process.poll() is None:
+            process.terminate()
+            process.wait(timeout=5)
+        _remove_file(input_path)
+        _remove_file(output_path)
+        _remove_file(ass_path)

@@ -5,7 +5,7 @@ import tempfile
 
 import streamlit as st
 
-from .config import FFMPEG_BIN, FFPROBE_BIN, SAMPLE_WORD_POOL, FONT_FILE_PATHS
+from .config import FFMPEG_BIN, FFPROBE_BIN, SAMPLE_WORD_POOL, FONT_FILE_PATHS, PREVIEW_FPS
 from .ass_builder import build_ass_header, build_ass_events
 
 
@@ -49,7 +49,6 @@ def extract_preview_frame(video_bytes: bytes, cache_key: str) -> bytes:
     return frame_bytes
 
 
-@st.cache_data(show_spinner=False)
 def render_animated_preview(frame_bytes, group_size, font_name, font_size, primary_color,
                           highlight_color, outline_color, pos_y_percent, animation_style,
                           card_opacity_percent, card_bg_color, card_text_color,
@@ -90,9 +89,13 @@ def render_animated_preview(frame_bytes, group_size, font_name, font_size, prima
 
     out_path = os.path.join(work_dir, "preview.mp4")
     result = subprocess.run(
-        [FFMPEG_BIN, "-y", "-loop", "1", "-i", "frame.png", "-t", str(total_duration),
-         "-vf", "ass=style.ass", "-r", "25", "-pix_fmt", "yuv420p",
-         "-c:v", "libx264", "-preset", "ultrafast", "preview.mp4"],
+        [
+            FFMPEG_BIN, "-y", "-loop", "1", "-i", "frame.png",
+            "-t", str(total_duration), "-vf", "ass=style.ass",
+            "-r", str(PREVIEW_FPS), "-pix_fmt", "yuv420p", "-an",
+            "-c:v", "libx264", "-preset", "ultrafast", "-tune", "zerolatency",
+            "preview.mp4",
+        ],
         capture_output=True, text=True, cwd=work_dir,
     )
 

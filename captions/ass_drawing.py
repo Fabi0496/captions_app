@@ -14,7 +14,22 @@ def measure_text_width(text: str, font_path: str, font_size: int) -> int:
 
 def build_rounded_rect_path_topleft(width: float, height: float, radius: float) -> str:
     """Erzeugt einen einfachen, abgerundeten Rechteckpfad für ASS \\p1 Drawings."""
-    if radius <= 0:
+    radius = max(0.0, min(radius, width / 2, height / 2))
+    if radius == 0:
         return f"m 0 0 l {width} 0 l {width} {height} l 0 {height} l 0 0"
-    # Für die App reicht ein kompakter, sauberer Rechteckpfad aus; FFmpeg akzeptiert ihn in ASS.
-    return f"m 0 0 l {width} 0 l {width} {height} l 0 {height} l 0 0"
+
+    kappa = 0.5522848
+    right = width - radius
+    bottom = height - radius
+    control = radius * kappa
+    return (
+        f"m {radius:.2f} 0 "
+        f"l {right:.2f} 0 "
+        f"b {right + control:.2f} 0 {width:.2f} {radius - control:.2f} {width:.2f} {radius:.2f} "
+        f"l {width:.2f} {bottom:.2f} "
+        f"b {width:.2f} {bottom + control:.2f} {right + control:.2f} {height:.2f} {right:.2f} {height:.2f} "
+        f"l {radius:.2f} {height:.2f} "
+        f"b {radius - control:.2f} {height:.2f} 0 {bottom + control:.2f} 0 {bottom:.2f} "
+        f"l 0 {radius:.2f} "
+        f"b 0 {radius - control:.2f} {radius - control:.2f} 0 {radius:.2f} 0"
+    )
