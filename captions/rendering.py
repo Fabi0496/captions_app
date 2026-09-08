@@ -22,6 +22,35 @@ def _remove_file(path: str) -> None:
             time.sleep(0.2)
 
 
+def build_ass_content(file_bytes: bytes, corrected_words: list, style_params: dict) -> str:
+    """Erzeugt die ASS-Datei ohne das Video zu rendern."""
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as tmp_in:
+        tmp_in.write(file_bytes)
+        input_path = tmp_in.name
+
+    try:
+        probe = subprocess.run(
+            [FFPROBE_BIN, "-v", "error", "-select_streams", "v:0",
+             "-show_entries", "stream=width,height", "-of", "csv=s=x:p=0", input_path],
+            capture_output=True, text=True, check=True,
+        )
+        video_w, video_h = map(int, probe.stdout.strip().split("x"))
+        sp = style_params
+        groups = build_word_groups(corrected_words, sp["words_per_group"])
+        return (
+            build_ass_header(video_w, video_h, sp["font_name"], sp["font_size"],
+                             sp["primary_color"], sp["outline_color"], sp["pos_y_percent"])
+            + build_ass_events(
+                groups, sp["animation_style"], video_w, video_h,
+                sp["primary_color"], sp["highlight_color"], sp["pos_y_percent"],
+                sp["card_opacity_percent"], sp["font_size"], sp["font_file"],
+                sp["card_bg_color"], sp["card_text_color"], sp["card_corner_radius_percent"],
+            )
+        )
+    finally:
+        _remove_file(input_path)
+
+
 def render_final_video(file_bytes: bytes, corrected_words: list, style_params: dict, use_qsv: bool,
                       progress_callback=None):
     """Rendert das finale Video mit eingebrannten Untertiteln."""
@@ -35,8 +64,6 @@ def render_final_video(file_bytes: bytes, corrected_words: list, style_params: d
     process = None
 
     try:
-        groups = build_word_groups(corrected_words, sp["words_per_group"])
-
         probe = subprocess.run(
             [FFPROBE_BIN, "-v", "error", "-select_streams", "v:0",
              "-show_entries", "stream=width,height", "-of", "csv=s=x:p=0", input_path],
@@ -51,6 +78,7 @@ def render_final_video(file_bytes: bytes, corrected_words: list, style_params: d
         )
         duration = max(float(duration_probe.stdout.strip()), 0.01)
 
+        groups = build_word_groups(corrected_words, sp["words_per_group"])
         ass_content = (
             build_ass_header(video_w, video_h, sp["font_name"], sp["font_size"],
                              sp["primary_color"], sp["outline_color"], sp["pos_y_percent"])

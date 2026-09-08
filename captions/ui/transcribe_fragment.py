@@ -3,6 +3,7 @@ import pandas as pd
 import streamlit as st
 
 from ..config import WHISPER_LANGUAGES, WHISPER_MODELS
+from ..rendering import build_ass_content
 from ..transcription import transcribe_video
 
 
@@ -91,3 +92,16 @@ def transcribe_fragment():
                     current_words[:selected_idx] + current_words[selected_idx + 1:]
                 )
                 st.rerun(scope="fragment")
+
+        ass_content = build_ass_content(
+            st.session_state["file_bytes"],
+            current_words,
+            st.session_state["style_params"],
+        )
+        st.download_button(
+            "ASS-Datei herunterladen",
+            data=ass_content,
+            file_name="untertitel.ass",
+            mime="text/plain",
+            use_container_width=True,
+        )
