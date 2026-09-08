@@ -6,7 +6,7 @@ import tempfile
 import streamlit as st
 
 from .config import FFMPEG_BIN, FFPROBE_BIN, SAMPLE_WORD_POOL, FONT_FILE_PATHS, PREVIEW_FPS
-from .ass_builder import build_ass_header, build_ass_events
+from .ass_builder import build_ass_header, build_ass_events, build_word_groups
 
 
 def generate_sample_words(count: int):
@@ -102,13 +102,14 @@ def render_animated_preview(frame_bytes, group_size, font_name, font_size, prima
     except ValueError:
         return None
 
-    sample_words, last_end = generate_sample_words(group_size)
+    sample_words, last_end = generate_sample_words(len(SAMPLE_WORD_POOL))
     total_duration = last_end + 0.8
 
     ass_content = (
         build_ass_header(w, h, font_name, font_size, primary_color, outline_color, pos_y_percent)
         + build_ass_events(
-            [sample_words], animation_style, w, h, primary_color, highlight_color, pos_y_percent,
+            build_word_groups(sample_words, group_size), animation_style, w, h,
+            primary_color, highlight_color, pos_y_percent,
             card_opacity_percent, font_size, FONT_FILE_PATHS.get(font_name),
             card_bg_color, card_text_color, card_corner_radius_percent,
         )
@@ -122,9 +123,11 @@ def render_animated_preview(frame_bytes, group_size, font_name, font_size, prima
     result = subprocess.run(
         [
             FFMPEG_BIN, "-y", "-loop", "1", "-i", "frame.png",
-            "-t", str(total_duration), "-vf", "ass=style.ass",
-            "-r", str(PREVIEW_FPS), "-pix_fmt", "yuv420p", "-an",
-            "-c:v", "libx264", "-preset", "ultrafast", "-tune", "zerolatency",
+            "-t", str(total_duration), "-vf",
+            "ass=style.ass",
+            "-r", str(PREVIEW_FPS), "-an",
+            "-c:v", "libx264", "-preset", "medium", "-crf", "18",
+            "-pix_fmt", "yuv420p", "-movflags", "+faststart",
             "preview.mp4",
         ],
         capture_output=True, text=True, cwd=work_dir,
