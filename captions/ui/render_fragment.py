@@ -8,10 +8,10 @@ from ..utils import sanitize_filename
 
 @st.fragment
 def render_fragment():
-    st.subheader("Schritt 3: Video rendern")
-    use_qsv = st.checkbox("Intel Quick Sync (QSV) nutzen", value=True)
-
     if st.session_state["transcribed_words"] is not None:
+        st.subheader("Schritt 3: Video rendern")
+        use_qsv = st.checkbox("Intel Quick Sync (QSV) nutzen", value=True)
+
         if st.button("Animierte Untertitel erstellen"):
             progress = st.progress(0, text="Rendering wird vorbereitet...")
 

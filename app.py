@@ -38,8 +38,8 @@ st.markdown(
         border-radius: 14px;
     }
     .hero {
-        padding: 1.25rem 1.5rem;
-        margin-bottom: 1.25rem;
+        padding: .75rem 1.25rem;
+        margin-bottom: .75rem;
         border: 1px solid var(--panel-border);
         border-radius: 18px;
         background: linear-gradient(135deg, rgba(124, 92, 255, .22), rgba(32, 217, 196, .08));
@@ -53,7 +53,7 @@ st.markdown(
     }
     </style>
     <div class="hero">
-        <h1>Video → Animierte Untertitel</h1>
+        <h1>Captionizer</h1>
         <p>Transkribieren, stylen und Untertitel direkt als ASS in dein Video rendern.</p>
     </div>
     """,
