@@ -1,6 +1,6 @@
 """Fragment 1: Schrift-/Animations-Einstellungen, Live-Vorschau und Originalvideo."""
 import streamlit as st
-
+from .color_swatch_picker import color_swatch_picker
 from ..config import FONT_OPTIONS, FONT_FILE_PATHS, ANIMATION_STYLES, PREVIEW_WIDTH
 from ..preview import extract_preview_frame, render_animated_preview
 
@@ -38,17 +38,27 @@ def style_fragment():
                 "Kartentransparenz (%)", min_value=0, max_value=100, value=0,
                 help="0% = voll deckend, 100% = vollständig durchsichtig"
             )
-            card_bg_color = st.color_picker("Kartenfarbe", "#FFFFFF")
-            card_text_color = st.color_picker("Textfarbe auf Karte", "#000000")
+            card_bg_color = color_swatch_picker(
+                "Kartenfarbe", key="card_bg_color", default="#FFFFFF"
+            )
+            card_text_color = color_swatch_picker(
+                "Textfarbe auf Karte", key="card_text_color", default="#000000"
+            )
             card_corner_radius_percent = st.slider(
                 "Eckenrundung (%)", min_value=0, max_value=100, value=90,
                 help="0 = eckig, 100 = maximal rund"
             )
         else:
             font_size = st.slider("Schriftgröße", 20, 150, 110)
-            primary_color = st.color_picker("Textfarbe", "#FFFFFF")
-            highlight_color = st.color_picker("Highlight-Farbe (Karaoke)", "#00FF00")
-            outline_color = st.color_picker("Konturfarbe", "#000000")
+            primary_color = color_swatch_picker(
+                "Textfarbe", key="primary_color", default="#FFFFFF"
+            )
+            highlight_color = color_swatch_picker(
+                "Highlight-Farbe (Karaoke)", key="highlight_color", default="#00FF00"
+            )
+            outline_color = color_swatch_picker(
+                "Konturfarbe", key="outline_color", default="#000000"
+            )
             pos_y_percent = st.slider("Vertikale Position (% von unten)", 5, 90, 20)
 
     st.session_state["style_params"] = dict(
