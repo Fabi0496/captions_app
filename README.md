@@ -16,6 +16,8 @@ gestylte Untertitel per FFmpeg/ASS direkt ins Video einbrennt.
 - Animations-Stile: Karaoke-Highlight, Fade, Pop-In, Slide-Up, Paper Sheer
   (Karten-Style), oder keine Animation
 - Animierte Live-Vorschau direkt in der App
+- Sofortige Startvorschau beim Öffnen; nach dem Upload wird sie durch ein Bild
+  aus dem eigenen Video ersetzt
 - Hardware-beschleunigtes Rendering über Intel Quick Sync (QSV), mit
   Fallback auf CPU-Encoding
 - Frei wählbare Dateinamen für MP4- und ASS-Export

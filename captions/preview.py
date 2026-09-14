@@ -4,6 +4,7 @@ import subprocess
 import tempfile
 
 import streamlit as st
+from PIL import Image, ImageDraw
 
 from .config import FFMPEG_BIN, FFPROBE_BIN, SAMPLE_WORD_POOL, FONT_FILE_PATHS, PREVIEW_FPS
 from .ass_builder import build_ass_header, build_ass_events, build_word_groups
@@ -18,6 +19,30 @@ def generate_sample_words(count: int):
         words.append({"word": f" {w}", "start": t, "end": t + 0.35})
         t += 0.4
     return words, t
+
+
+@st.cache_data(show_spinner=False)
+def create_default_preview_frame() -> bytes:
+    """Erzeugt einen neutralen Hintergrund für die sofort verfügbare Startvorschau."""
+    image = Image.new("RGB", (1280, 720), "#141c2f")
+    draw = ImageDraw.Draw(image)
+    for y in range(image.height):
+        blend = y / max(image.height - 1, 1)
+        color = (
+            int(24 - 10 * blend),
+            int(37 - 16 * blend),
+            int(74 - 24 * blend),
+        )
+        draw.line((0, y, image.width, y), fill=color)
+
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as tmp_out:
+        image.save(tmp_out, format="PNG")
+        frame_path = tmp_out.name
+    try:
+        with open(frame_path, "rb") as frame_file:
+            return frame_file.read()
+    finally:
+        os.remove(frame_path)
 
 
 @st.cache_data(show_spinner=False)

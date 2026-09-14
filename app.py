@@ -6,11 +6,32 @@ import streamlit as st  # pyright: ignore[reportMissingImports]
 from captions.ui.style_fragment import style_fragment
 from captions.ui.transcribe_fragment import transcribe_fragment
 from captions.ui.render_fragment import render_fragment
+from captions.preview import create_default_preview_frame, render_animated_preview
 
 st.set_page_config(
     page_title="Animierte Untertitel",
     layout="wide",
 )
+
+# Die Startvorschau wird einmal pro Host-Prozess vorgeneriert. Dadurch ist
+# direkt nach dem Öffnen bereits ein Beispiel sichtbar.
+if "default_preview_video" not in st.session_state:
+    with st.spinner("Animierte Startvorschau wird geladen...", show_time=True):
+        st.session_state["default_preview_video"] = render_animated_preview(
+            create_default_preview_frame(),
+            2,
+            "Tahoma",
+            110,
+            "#FFFFFF",
+            "#00FF00",
+            "#000000",
+            20,
+            "Paper Sheer (weiße Karte)",
+            0,
+            "#FFFFFF",
+            "#000000",
+            90,
+        )
 
 st.markdown(
     """
@@ -47,6 +68,9 @@ st.markdown(
     }
     .hero h1 { margin: 0; letter-spacing: -0.03em; }
     .hero p { margin: .35rem 0 0; color: var(--muted); }
+    .preview-caption { text-align: center; color: var(--muted); font-size: .875rem; }
+    [data-testid="stSpinner"] { justify-content: center; text-align: center; }
+    [data-testid="stSpinner"] > div { margin: 0 auto; }
     div.stButton > button[kind="primary"] {
         background: linear-gradient(135deg, var(--accent), #5b8cff);
         border: 0;
