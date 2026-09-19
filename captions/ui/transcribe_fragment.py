@@ -9,7 +9,8 @@ from ..transcription import transcribe_video
 
 @st.fragment
 def transcribe_fragment():
-    st.subheader("Schritt 1: Transkription")
+    st.markdown('<div class="section-kicker">03 / Find the rhythm</div>', unsafe_allow_html=True)
+    st.subheader("Transcription")
     whisper_model_size = st.selectbox("Whisper-Modell", WHISPER_MODELS, index=3)
     language_label = st.selectbox(
         "Sprache der Audiospur",
@@ -40,7 +41,7 @@ def transcribe_fragment():
         st.rerun()
 
     if st.session_state["transcribed_words"] is not None:
-        st.subheader("Schritt 2: Text korrigieren")
+        st.subheader("Fine-tune your words")
         st.caption(
             "Wörter/Zeiten direkt in der Tabelle anpassen. Über die Auswahl darunter "
             "kannst du eine Zeile teilen (Zeit wird halbiert) oder löschen."

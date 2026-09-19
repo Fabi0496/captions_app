@@ -66,24 +66,8 @@ def color_swatch_picker(label: str, key: str, default: str = "#FFFFFF") -> str:
     css_rules = []
 
     st.markdown(
-        f"""
-        <div style="display:flex;align-items:center;gap:6px;margin:0 0 4px 0;
-                    color:rgba(250,250,250,0.8);font-size:0.875rem;
-                    font-weight:400;line-height:1.25rem;">
-            <span>{label}</span>
-            <span title="Für eigene Farbe auf das Farbfeld klicken"
-                  style="display:inline-flex;align-items:center;color:#9aa9c7;cursor:help;">
-                <svg width="14" height="14" viewBox="0 0 24 24"
-                     fill="none" stroke="currentColor" stroke-width="2"
-                     stroke-linecap="round" stroke-linejoin="round"
-                     aria-label="Für eigene Farbe auf das Farbfeld klicken">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <path d="M9.5 9a2.5 2.5 0 1 1 4.6 1.4c-.8.9-2.1 1.2-2.1 2.6"></path>
-                    <line x1="12" y1="16.5" x2="12.01" y2="16.5"></line>
-                </svg>
-            </span>
-        </div>
-        """,
+        f'<div class="color-picker-label"><span>{label}</span>'
+        '<span class="color-picker-help" title="Für eigene Farbe auf das Farbfeld klicken">?</span></div>',
         unsafe_allow_html=True,
     )
 

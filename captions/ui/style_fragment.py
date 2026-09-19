@@ -10,10 +10,10 @@ def style_fragment():
     control_col, preview_col = st.columns([1.0, 1.5])
 
     with control_col:
-        st.subheader("Einstellungen")
-        st.subheader("Animation")
+        st.markdown('<div class="section-kicker">02 / Shape the mood</div>', unsafe_allow_html=True)
+        st.subheader("Style settings")
         animation_style = st.selectbox(
-            "Animations-Stil", ANIMATION_STYLES,
+            "Animationsstil", ANIMATION_STYLES,
             index=ANIMATION_STYLES.index("Paper Sheer (weiße Karte)"),
         )
 
@@ -23,7 +23,7 @@ def style_fragment():
         )
         font_choice = st.selectbox("Schriftart", list(FONT_OPTIONS.keys()), index=0)
         font_name = FONT_OPTIONS[font_choice]
-        font_size = 110
+        font_size = st.slider("Schriftgröße", 20, 150, 110)
         primary_color = "#FFFFFF"
         highlight_color = "#00FF00"
         outline_color = "#000000"
@@ -33,7 +33,7 @@ def style_fragment():
         card_opacity_percent = 88
         card_corner_radius_percent = 90
 
-        if animation_style == "Paper Sheer (weiße Karte)":
+        if animation_style.startswith("Paper Sheer"):
             card_opacity_percent = st.slider(
                 "Kartentransparenz (%)", min_value=0, max_value=100, value=0,
                 help="0% = voll deckend, 100% = vollständig durchsichtig"
@@ -48,8 +48,11 @@ def style_fragment():
                 "Eckenrundung (%)", min_value=0, max_value=100, value=90,
                 help="0 = eckig, 100 = maximal rund"
             )
+            pos_y_percent = st.slider(
+                "Vertikale Position (% von unten)", 5, 90, 20,
+                help="Legt fest, wie hoch die Untertitelkarte im Video erscheint."
+            )
         else:
-            font_size = st.slider("Schriftgröße", 20, 150, 110)
             primary_color = color_swatch_picker(
                 "Textfarbe", key="primary_color", default="#FFFFFF"
             )
@@ -72,7 +75,7 @@ def style_fragment():
 
     with preview_col:
         st.markdown(
-            "<h3 style='text-align:center; width:100%;'>Style-Vorschau</h3>",
+            "<div class='section-kicker' style='text-align:center;'>Live canvas</div><h3 style='text-align:center; width:100%;'>Style preview</h3>",
             unsafe_allow_html=True,
         )
         if st.session_state["file_bytes"] is None:
