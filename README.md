@@ -18,8 +18,7 @@ gestylte Untertitel per FFmpeg/ASS direkt ins Video einbrennt.
 - Animierte Live-Vorschau direkt in der App
 - Style-Vorschau nach der Transkription mit echten Untertiteln aus dem eigenen
   Video (auf maximal 8 Sekunden begrenzt)
-- Hardware-beschleunigtes Rendering über Intel Quick Sync (QSV), mit
-  Fallback auf CPU-Encoding
+- Rendering über FFmpeg mit CPU-Encoding
 - Frei wählbare Dateinamen für MP4- und ASS-Export
 
 ## Ordnerstruktur

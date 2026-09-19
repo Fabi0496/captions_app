@@ -22,7 +22,6 @@ def render_fragment():
                 st.session_state["file_bytes"],
                 st.session_state["transcribed_words"],
                 st.session_state["style_params"],
-                False,
                 progress_callback=update_progress,
             )
             progress.empty()

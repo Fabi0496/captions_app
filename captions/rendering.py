@@ -51,7 +51,7 @@ def build_ass_content(file_bytes: bytes, corrected_words: list, style_params: di
         _remove_file(input_path)
 
 
-def render_final_video(file_bytes: bytes, corrected_words: list, style_params: dict, use_qsv: bool,
+def render_final_video(file_bytes: bytes, corrected_words: list, style_params: dict,
                       progress_callback=None):
     """Rendert das finale Video mit eingebrannten Untertiteln."""
     with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as tmp_in:
@@ -98,12 +98,8 @@ def render_final_video(file_bytes: bytes, corrected_words: list, style_params: d
         with open(ass_path, "w", encoding="utf-8") as f:
             f.write(ass_content)
 
-        if use_qsv:
-            cmd = [FFMPEG_BIN, "-y", "-i", input_filename, "-vf", f"ass={ass_filename}",
-                   "-c:v", "h264_qsv", "-c:a", "aac", output_filename]
-        else:
-            cmd = [FFMPEG_BIN, "-y", "-i", input_filename, "-vf", f"ass={ass_filename}",
-                   "-c:v", "libx264", "-preset", "ultrafast", "-c:a", "aac", output_filename]
+        cmd = [FFMPEG_BIN, "-y", "-i", input_filename, "-vf", f"ass={ass_filename}",
+               "-c:v", "libx264", "-preset", "ultrafast", "-c:a", "aac", output_filename]
 
         cmd[1:1] = ["-progress", "pipe:1", "-nostats", "-loglevel", "error"]
         if progress_callback:
@@ -132,21 +128,6 @@ def render_final_video(file_bytes: bytes, corrected_words: list, style_params: d
                 progress_output.append(line)
         stderr = process.stderr.read() if process.stderr else ""
         return_code = process.wait()
-
-        if return_code != 0 and use_qsv:
-            fallback_cmd = [
-                FFMPEG_BIN, "-y", "-i", input_filename, "-vf", f"ass={ass_filename}",
-                "-c:v", "libx264", "-preset", "ultrafast", "-c:a", "aac", output_filename,
-            ]
-            fallback_cmd[1:1] = ["-progress", "pipe:1", "-nostats", "-loglevel", "error"]
-            if progress_callback:
-                progress_callback(5, "QSV nicht verfügbar – CPU-Rendering wird verwendet...")
-            fallback = subprocess.run(
-                fallback_cmd, cwd=work_dir, capture_output=True, text=True,
-            )
-            return_code = fallback.returncode
-            stderr = fallback.stderr
-            progress_output = [fallback.stdout] if fallback.stdout else progress_output
 
         if return_code != 0:
             return {"success": False, "video_bytes": None, "ass_content": ass_content,
