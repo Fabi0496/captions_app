@@ -10,7 +10,7 @@ def style_fragment():
     control_col, preview_col = st.columns([1.0, 1.5])
 
     with control_col:
-        st.markdown('<div class="section-kicker">02 / Shape the mood</div>', unsafe_allow_html=True)
+        st.markdown('<div class="step-kicker">03 / Shape the mood</div>', unsafe_allow_html=True)
         st.subheader("Style settings")
         animation_style = st.selectbox(
             "Animationsstil", ANIMATION_STYLES,
@@ -78,23 +78,14 @@ def style_fragment():
             "<div class='section-kicker' style='text-align:center;'>Live canvas</div><h3 style='text-align:center; width:100%;'>Style preview</h3>",
             unsafe_allow_html=True,
         )
-        if st.session_state["file_bytes"] is None:
-            default_preview = st.session_state.get("default_preview_video")
-            if default_preview:
-                with st.container(horizontal_alignment="center"):
-                    st.video(default_preview, width=PREVIEW_WIDTH, loop=True, autoplay=True, muted=True)
-                st.markdown(
-                    "<div class='preview-caption'>Beispielvorschau – nach dem Upload wird dein Videobild verwendet.</div>",
-                    unsafe_allow_html=True,
-                )
-            else:
-                st.warning("Startvorschau konnte nicht erstellt werden.")
-        else:
+        if st.session_state["transcribed_words"] is not None:
+            current_words = st.session_state["transcribed_words"]
             preview_signature = (
                 st.session_state["file_hash"], words_per_group, font_name, font_size,
                 primary_color, highlight_color, outline_color, pos_y_percent,
                 animation_style, card_opacity_percent, card_bg_color,
                 card_text_color, card_corner_radius_percent,
+                tuple((word["word"], word["start"], word["end"]) for word in current_words),
             )
             preview_placeholder = st.empty()
             caption_placeholder = st.empty()
@@ -117,7 +108,7 @@ def style_fragment():
                         base_frame, words_per_group, font_name, font_size,
                         primary_color, highlight_color, outline_color, pos_y_percent,
                         animation_style, card_opacity_percent, card_bg_color,
-                        card_text_color, card_corner_radius_percent
+                        card_text_color, card_corner_radius_percent, current_words
                     )
                 st.session_state["preview_signature"] = preview_signature
             preview_video = st.session_state["preview_video"]
@@ -125,7 +116,7 @@ def style_fragment():
                 with preview_placeholder.container(horizontal_alignment="center"):
                     st.video(preview_video, width=PREVIEW_WIDTH, loop=True, autoplay=True, muted=True)
                 caption_placeholder.markdown(
-                    f"<div class='preview-caption'>Beispiel mit {words_per_group} Wort(en) pro Untertitel-Zeile</div>",
+                    f"<div class='preview-caption'>Echte Untertitelvorschau mit {words_per_group} Wort(en) pro Zeile · Videobild ist nur ein Screenshot zur Ausrichtung</div>",
                     unsafe_allow_html=True,
                 )
             else:

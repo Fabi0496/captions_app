@@ -16,8 +16,8 @@ gestylte Untertitel per FFmpeg/ASS direkt ins Video einbrennt.
 - Animations-Stile: Karaoke-Highlight, Fade, Pop-In, Slide-Up, Paper Sheer
   (Karten-Style), oder keine Animation
 - Animierte Live-Vorschau direkt in der App
-- Sofortige Startvorschau beim Öffnen; nach dem Upload wird sie durch ein Bild
-  aus dem eigenen Video ersetzt
+- Style-Vorschau nach der Transkription mit echten Untertiteln aus dem eigenen
+  Video (auf maximal 8 Sekunden begrenzt)
 - Hardware-beschleunigtes Rendering über Intel Quick Sync (QSV), mit
   Fallback auf CPU-Encoding
 - Frei wählbare Dateinamen für MP4- und ASS-Export
@@ -109,13 +109,12 @@ streamlit run app.py
 Im Browser (`http://localhost:8501`):
 
 1. Video hochladen
-2. Sidebar-Einstellungen anpassen (Schrift, Farben, Animation)
-3. Live-Vorschau prüfen
-4. Whisper-Modell und optional die Sprache der Audiospur wählen und
+2. Whisper-Modell und optional die Sprache der Audiospur wählen und
    **„Video transkribieren"** klicken
-5. Text bei Bedarf in der Tabelle korrigieren (Wörter teilen/löschen)
-6. **„Animierte Untertitel erstellen"** klicken
-7. Fertiges Video bzw. `.ass`-Datei über die Download-Buttons speichern
+3. Text bei Bedarf in der Tabelle korrigieren (Wörter teilen/löschen)
+4. Style einstellen und die Live-Vorschau mit den echten Untertiteln prüfen
+5. **„Animierte Untertitel erstellen"** klicken
+6. Fertiges Video bzw. `.ass`-Datei über die Download-Buttons speichern
 
 ## Projekt als ZIP sichern
 

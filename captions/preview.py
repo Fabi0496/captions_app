@@ -6,7 +6,10 @@ import tempfile
 import streamlit as st
 from PIL import Image, ImageDraw
 
-from .config import FFMPEG_BIN, FFPROBE_BIN, SAMPLE_WORD_POOL, FONT_FILE_PATHS, PREVIEW_FPS
+from .config import (
+    FFMPEG_BIN, FFPROBE_BIN, SAMPLE_WORD_POOL, FONT_FILE_PATHS, PREVIEW_FPS,
+    PREVIEW_MAX_DURATION,
+)
 from .ass_builder import build_ass_header, build_ass_events, build_word_groups
 
 
@@ -108,8 +111,8 @@ def create_display_video(video_bytes: bytes, cache_key: str) -> bytes:
 def render_animated_preview(frame_bytes, group_size, font_name, font_size, primary_color,
                           highlight_color, outline_color, pos_y_percent, animation_style,
                           card_opacity_percent, card_bg_color, card_text_color,
-                          card_corner_radius_percent):
-    """Brennt den aktuellen Style mit Beispieltext auf ein kurzes, gelooptes Standbild-Video."""
+                          card_corner_radius_percent, preview_words=None):
+    """Brennt den aktuellen Style mit Transkripttext auf ein kurzes Vorschauvideo."""
     work_dir = tempfile.mkdtemp()
     frame_path = os.path.join(work_dir, "frame.png")
     with open(frame_path, "wb") as f:
@@ -127,13 +130,24 @@ def render_animated_preview(frame_bytes, group_size, font_name, font_size, prima
     except ValueError:
         return None
 
-    sample_words, last_end = generate_sample_words(len(SAMPLE_WORD_POOL))
-    total_duration = last_end + 0.8
+    if preview_words is None:
+        preview_words = generate_sample_words(len(SAMPLE_WORD_POOL))[0]
+    else:
+        preview_words = [
+            {**word, "end": min(float(word["end"]), PREVIEW_MAX_DURATION)}
+            for word in preview_words
+            if float(word["start"]) < PREVIEW_MAX_DURATION
+        ]
+    last_end = max((word["end"] for word in preview_words), default=0.0)
+    total_duration = min(
+        max(last_end + 0.8, 1.0),
+        PREVIEW_MAX_DURATION,
+    )
 
     ass_content = (
         build_ass_header(w, h, font_name, font_size, primary_color, outline_color, pos_y_percent)
         + build_ass_events(
-            build_word_groups(sample_words, group_size), animation_style, w, h,
+            build_word_groups(preview_words, group_size), animation_style, w, h,
             primary_color, highlight_color, pos_y_percent,
             card_opacity_percent, font_size, FONT_FILE_PATHS.get(font_name),
             card_bg_color, card_text_color, card_corner_radius_percent,

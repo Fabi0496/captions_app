@@ -9,7 +9,7 @@ from ..transcription import transcribe_video
 
 @st.fragment
 def transcribe_fragment():
-    st.markdown('<div class="section-kicker">03 / Find the rhythm</div>', unsafe_allow_html=True)
+    st.markdown('<div class="step-kicker">02 / Find the rhythm</div>', unsafe_allow_html=True)
     st.subheader("Transcription")
     whisper_model_size = st.selectbox("Whisper-Modell", WHISPER_MODELS, index=3)
     language_label = st.selectbox(
@@ -38,6 +38,7 @@ def transcribe_fragment():
 
         st.session_state["transcribed_words"] = all_words
         st.session_state["transcribed_file_hash"] = st.session_state["file_hash"]
+        st.session_state["correction_completed"] = False
         st.rerun()
 
     if st.session_state["transcribed_words"] is not None:
@@ -93,6 +94,10 @@ def transcribe_fragment():
                     current_words[:selected_idx] + current_words[selected_idx + 1:]
                 )
                 st.rerun(scope="fragment")
+
+        if st.button("Fertig Korrigiert", type="primary", use_container_width=True):
+            st.session_state["correction_completed"] = True
+            st.rerun()
 
         ass_content = build_ass_content(
             st.session_state["file_bytes"],

@@ -8,8 +8,8 @@ from ..utils import sanitize_filename
 
 @st.fragment
 def render_fragment():
-    if st.session_state["transcribed_words"] is not None:
-        st.markdown('<div class="section-kicker">04 / Make it real</div>', unsafe_allow_html=True)
+    if st.session_state["correction_completed"]:
+        st.markdown('<div class="step-kicker">04 / Make it real</div>', unsafe_allow_html=True)
         st.subheader("Render your final video")
 
         if st.button("Animierte Untertitel erstellen"):

@@ -6,33 +6,13 @@ import streamlit as st  # pyright: ignore[reportMissingImports]
 from captions.ui.style_fragment import style_fragment
 from captions.ui.transcribe_fragment import transcribe_fragment
 from captions.ui.render_fragment import render_fragment
-from captions.preview import create_default_preview_frame, render_animated_preview
+from captions.config import FONT_FILE_PATHS
 
 st.set_page_config(
     page_title="Animierte Untertitel",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
-
-# Die Startvorschau wird einmal pro Host-Prozess vorgeneriert. Dadurch ist
-# direkt nach dem Öffnen bereits ein Beispiel sichtbar.
-if "default_preview_video" not in st.session_state:
-    with st.spinner("Animierte Startvorschau wird geladen...", show_time=True):
-        st.session_state["default_preview_video"] = render_animated_preview(
-            create_default_preview_frame(),
-            2,
-            "Tahoma",
-            110,
-            "#FFFFFF",
-            "#00FF00",
-            "#000000",
-            20,
-            "Paper Sheer (weiße Karte)",
-            0,
-            "#FFFFFF",
-            "#000000",
-            90,
-        )
 
 st.markdown(
     """
@@ -71,7 +51,7 @@ st.markdown(
     .hero {
         position: relative; overflow: hidden; padding: 2.75rem 3rem 2.6rem;
         margin-bottom: 1.25rem; border: 1px solid var(--ink); border-radius: 2px;
-        background: var(--panel); box-shadow: 10px 10px 0 var(--lime);
+        background: var(--panel); box-shadow: 10px 10px 0 var(--coral);
     }
     .hero:after { content: "✦"; position: absolute; right: 2.5rem; top: 1.4rem; color: var(--coral); font-size: 4.5rem; line-height: 1; transform: rotate(12deg); }
     .hero-kicker { color: var(--coral); font-size: .72rem; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
@@ -79,6 +59,12 @@ st.markdown(
     .hero p { max-width: 620px; margin: .9rem 0 0; color: var(--muted); font-size: 1.05rem; line-height: 1.55; }
     .upload-card { padding: 1.15rem 1.35rem .5rem; margin: 2.4rem 0 1.8rem; border: 1px dashed var(--ink); background: rgba(255, 253, 248, .7); }
     .upload-card-label { margin-bottom: .5rem; color: var(--ink); font-size: .78rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+    .step-kicker {
+        padding: .72rem 1rem; margin: 2.4rem 0 1rem;
+        border: 1px dashed var(--ink); background: rgba(255, 253, 248, .7);
+        color: var(--ink); font-size: .68rem; font-weight: 800;
+        letter-spacing: .12em; line-height: 1.2; text-transform: uppercase;
+    }
     [data-testid="stFileUploader"] { background: transparent; border: 0; }
     [data-testid="stFileUploaderDropzone"] { min-height: 5.5rem; border: 1px dashed var(--line); border-radius: 0; background: var(--paper); }
     [data-testid="stFileUploaderDropzoneInstructions"],
@@ -185,6 +171,16 @@ for key, default in [
     ("transcribed_words", None), ("transcribed_file_hash", None),
     ("file_bytes", None), ("file_hash", None),
     ("preview_video", None), ("preview_signature", None),
+    ("correction_completed", False),
+    ("style_params", {
+        "words_per_group": 2, "font_name": "Tahoma", "font_size": 110,
+        "primary_color": "#FFFFFF", "highlight_color": "#00FF00",
+        "outline_color": "#000000", "pos_y_percent": 20,
+        "animation_style": "Paper Sheer (weiße Karte)",
+        "card_opacity_percent": 0, "card_bg_color": "#FFFFFF",
+        "card_text_color": "#000000", "card_corner_radius_percent": 90,
+        "font_file": FONT_FILE_PATHS.get("Tahoma"),
+    }),
 ]:
     if key not in st.session_state:
         st.session_state[key] = default
@@ -207,14 +203,14 @@ if uploaded_file is not None:
         st.session_state["preview_signature"] = None
         st.session_state["transcribed_words"] = None
         st.session_state["transcribed_file_hash"] = None
+        st.session_state["correction_completed"] = False
         st.session_state["render_result"] = None
         st.session_state["render_error"] = None
 
-    style_fragment()
     transcribe_fragment()
-    render_fragment()
-else:
-    style_fragment()
+    if st.session_state["correction_completed"]:
+        style_fragment()
+        render_fragment()
 
 st.markdown(
     '<div class="footer-note">Captionizer studio · Designed for creators who care about the details.</div>',
